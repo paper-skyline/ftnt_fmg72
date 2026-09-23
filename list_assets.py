@@ -93,8 +93,14 @@ payload = json.dumps({
         "name",
         "os_ver",
         "patch",
+        "build",
         "version"
       ],
+      #"filter": [
+      #  "conn_status",
+      #  "--",
+      #  "up"
+      #],
       "sortings": [
         {
           "sn": 1
