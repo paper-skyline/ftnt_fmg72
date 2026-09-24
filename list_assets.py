@@ -114,9 +114,14 @@ payload = json.dumps({
   "id": 1
 })
 
-# This call with requests will ignore the FortiManager certificate
+# Requests will ignore the FortiManager certificate and set a timeout limit
 
-response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+try:
+  response = requests.request("POST", url, headers=headers, data=payload, verify=False,timeout=(3.05, 27))
+except requests.exceptions.ConnectionError as errc:
+  raise SystemExit(errc)
+except requests.exceptions.Timeout as errt:
+  raise SystemExit(errt)
 
 data = (response.json())
 # print(json.dumps(data, indent=4, sort_keys=True))
@@ -128,6 +133,15 @@ for item in data['result'][0]['data']:
 
 for item in devices:
   item['last_checked'] = datetime.fromtimestamp(item['last_checked']).strftime('%Y-%m-%d %H:%M:%S')  
+
+"""
+placeholder for device sn in fmg comparison to device sn in fc
+
+device_sn = []
+
+for item in devices:
+  device_sn.append(item['sn'])
+"""
 
 csv_fields = []
 
