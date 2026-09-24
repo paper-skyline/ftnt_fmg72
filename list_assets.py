@@ -146,7 +146,7 @@ csv_fields = []
 for key in devices[0]:
   csv_fields.append(key)
 
-with open('devices.csv', 'w') as csvfile:
+with open('devices.csv', 'w', newline='') as csvfile:
     writer = csv.DictWriter(csvfile,fieldnames=csv_fields)
     writer.writeheader()
     writer.writerows(devices)
