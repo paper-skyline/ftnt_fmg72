@@ -118,10 +118,8 @@ payload = json.dumps({
 
 try:
   response = requests.request("POST", url, headers=headers, data=payload, verify=False,timeout=(3.05, 27))
-except requests.exceptions.ConnectionError as errc:
+except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as errc:
   raise SystemExit(errc)
-except requests.exceptions.Timeout as errt:
-  raise SystemExit(errt)
 
 data = (response.json())
 # print(json.dumps(data, indent=4, sort_keys=True))
@@ -152,3 +150,6 @@ with open('devices.csv', 'w') as csvfile:
     writer = csv.DictWriter(csvfile,fieldnames=csv_fields)
     writer.writeheader()
     writer.writerows(devices)
+
+print("script ran successfully")
+sys.exit(0)
