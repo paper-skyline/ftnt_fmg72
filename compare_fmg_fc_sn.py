@@ -1,5 +1,5 @@
 """
-File: list_assets.py
+File: compare_fmg_fc_sn.py
 Created by: Ben Cook
 Last Updated: 24 Sep 2026
 
@@ -212,7 +212,7 @@ def query_asset_portal(pattern):
   # print(json.dumps(assets,indent=4,sort_keys=True))
   return ftnt_assets
 
-sn_pattern = ["FGT", "FGVM", "FR"]
+sn_pattern = ["FGT", "FGVM", "FR", "FGR"]
 
 for item in sn_pattern:
     query_asset_portal(item)
@@ -227,7 +227,7 @@ print("FortiCare Asset Portal Section Completed Successfully\n")
 # Devices in FortiManager and not in FortiCare Asset Portal
 
 # print("Devices in FortiManager and not in FortiCare Asset Portal")
-unique_fmg_sn= (list(set(fmg_device_sn) - set(fc_device_sn)))
+unique_fmg_sn = (list(set(fmg_device_sn) - set(fc_device_sn)))
 # print(unique_fmg_sn)
 # print("\n")
 
@@ -256,7 +256,7 @@ with open('compare-devices-sn.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     writer.writerow(["Devices in FortiManager and not in FortiCare Asset Portal"])
     writer.writerows(csv_unique_fmg_sn)
-    writer.writerow(["Devices in FortiManager and not in FortiCare Asset Portal"])
+    writer.writerow(["Devices in FortiCare Asset Portal and not in FortiManager"])
     writer.writerows(csv_unique_ftnt_sn)
 
 print("script ran successfully")

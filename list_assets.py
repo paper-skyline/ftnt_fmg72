@@ -56,6 +56,11 @@ except ImportError:
 
 from datetime import datetime, timezone
 
+import urllib3
+
+# Disabling the insecure warning because internal FMG certificate is likely to be self-signed
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 load_dotenv()
 fmg_ip = os.getenv("fmg_ip")
 api_token = os.getenv("api_token")
@@ -132,15 +137,6 @@ for item in data['result'][0]['data']:
 for item in devices:
   item['last_checked'] = datetime.fromtimestamp(item['last_checked']).strftime('%Y-%m-%d %H:%M:%S')  
 
-"""
-placeholder for device sn in fmg comparison to device sn in fc
-
-device_sn = []
-
-for item in devices:
-  device_sn.append(item['sn'])
-"""
-
 csv_fields = []
 
 for key in devices[0]:
@@ -151,5 +147,5 @@ with open('devices.csv', 'w', newline='') as csvfile:
     writer.writeheader()
     writer.writerows(devices)
 
-print("script ran successfully")
+print("Script ran successfully. Please open 'devices.csv' to verify the output.")
 sys.exit(0)
