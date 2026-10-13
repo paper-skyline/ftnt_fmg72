@@ -12,48 +12,14 @@ You must create a '.env' file within the project directory and create two string
   'fmg_ip' that contains the ip address of your FortiManager.
 
 Full API documentation for FortiManager and other Fortinet products is available
-on their Fortinet Developers Network website: 
+on their Fortinet Developers Network website:
 https://fndn.fortinet.net/index.php?/fortiapi/5-fortimanager/
 """
 
+import csv
+import json
 import os
 import sys
-
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    print(
-      "Dotenv dependency not met.\n" +
-      "Please install with pip install dotenv" 
-    )
-    sys.exit(1)
-
-try:
-    import requests
-except ImportError:
-    print(
-        "Requests dependency not met.\n" +
-        "Please install with pip install requests"
-    )
-    sys.exit(1)
-
-try:
-    import json
-except ImportError:
-    print(
-        "JSON dependency not met.\n" +
-        "Please install with pip install json"
-    )
-    sys.exit(1)
-
-try:
-    import csv
-except ImportError:
-    print(
-        "Requests dependency not met.\n" +
-        "Please install with pip install csv")
-    sys.exit(1)
-
 from datetime import datetime, timezone
 
 import urllib3
@@ -61,89 +27,100 @@ import urllib3
 # Disabling the insecure warning because internal FMG certificate is likely to be self-signed
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    print("Dotenv dependency not met.\n" + "Please install with pip install dotenv")
+    sys.exit(1)
+
+try:
+    import requests
+except ImportError:
+    print("Requests dependency not met.\n" + "Please install with pip install requests")
+    sys.exit(1)
+
 load_dotenv()
 fmg_ip = os.getenv("fmg_ip")
 api_token = os.getenv("api_token")
 
 url = "https://" + fmg_ip + "/jsonrpc"
 
-headers = {
-  'Content-Type': 'application/json',
-  'Authorization': 'Bearer ' + api_token
-}
+headers = {"Content-Type": "application/json", "Authorization": "Bearer " + api_token}
 
 # These fields can be changed to suit your own use case; sourced from FNDN
 
-payload = json.dumps({
-  "method": "get",
-  "params": [
+payload = json.dumps(
     {
-      "fields": [
-        "hostname",
-        "desc",
-        "sn",
-        "conn_status",
-        "conn_mode",
-        "fap_cnt",
-        "fsw_cnt",
-        "hw_generation",
-        "hw_rev_major",
-        "hw_rev_minor",
-        "ip",
-        "last_checked",
-        "last_resync",
-        "latitude",
-        "longitude",
-        "location_from",
-        "name",
-        "os_ver",
-        "patch",
-        "build",
-        "version"
-      ],
-      #"filter": [
-      #  "conn_status",
-      #  "--",
-      #  "up"
-      #],
-      "sortings": [
-        {
-          "sn": 1
-        }
-      ],
-      "loadsub": 0,
-      "url": "/dvmdb/device"
+        "method": "get",
+        "params": [
+            {
+                "fields": [
+                    "hostname",
+                    "desc",
+                    "sn",
+                    "conn_status",
+                    "conn_mode",
+                    "fap_cnt",
+                    "fsw_cnt",
+                    "hw_generation",
+                    "hw_rev_major",
+                    "hw_rev_minor",
+                    "ip",
+                    "last_checked",
+                    "last_resync",
+                    "latitude",
+                    "longitude",
+                    "location_from",
+                    "name",
+                    "os_ver",
+                    "patch",
+                    "build",
+                    "version",
+                ],
+                # "filter": [
+                #  "conn_status",
+                #  "--",
+                #  "up"
+                # ],
+                "sortings": [{"sn": 1}],
+                "loadsub": 0,
+                "url": "/dvmdb/device",
+            }
+        ],
+        "verbose": 1,
+        "id": 1,
     }
-  ],
-  "verbose": 1,
-  "id": 1
-})
+)
 
 # Requests will ignore the FortiManager certificate and set a timeout limit
 
 try:
-  response = requests.request("POST", url, headers=headers, data=payload, verify=False,timeout=(3.05, 27))
+    response = requests.request(
+        "POST", url, headers=headers, data=payload, verify=False, timeout=(3.05, 27)
+    )
 except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as errc:
-  raise SystemExit(errc)
+    raise SystemExit(errc)
 
-data = (response.json())
+data = response.json()
 # print(json.dumps(data, indent=4, sort_keys=True))
 
 devices = []
 
-for item in data['result'][0]['data']:
-  devices.append(item)
+for item in data["result"][0]["data"]:
+    devices.append(item)
 
 for item in devices:
-  item['last_checked'] = datetime.fromtimestamp(item['last_checked']).strftime('%Y-%m-%d %H:%M:%S')  
+    item["last_checked"] = datetime.fromtimestamp(item["last_checked"]).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
 csv_fields = []
 
 for key in devices[0]:
-  csv_fields.append(key)
+    csv_fields.append(key)
 
-with open('devices.csv', 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile,fieldnames=csv_fields)
+with open("devices.csv", "w", newline="") as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=csv_fields)
     writer.writeheader()
     writer.writerows(devices)
 
