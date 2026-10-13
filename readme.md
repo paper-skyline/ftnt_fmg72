@@ -23,10 +23,15 @@ Check out [Fortinet's Document Library](https://docs.fortinet.com/document/forti
 After cloning the project, you must create a '.env' file within the project directory and create several string variables:
 
   __fc_username__ - that contains your FortiCare username
+
   __fc_password__ - that contains your FortiCare password
+  
   __fc_client_id__ - that contains your FortiCare client_id
+  
   __fc_grant_type__ - that contains the type of grants for the FortiCare user
+  
   __api_token__ that contains your private API token for FortiManager
+  
   __fmg_ip__ that contains the ip address of your FortiManager
 
 From the project directory, either activate the virtual environment shell by running `pipenv shell` and then run the script you want. Alternatively, you can run the script directly without activating the environment by `pipenv run python <script>`.
